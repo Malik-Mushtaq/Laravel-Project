@@ -1,59 +1,78 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\AdminController;
 
-//authentication pages
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register');
+// Show login page
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 
-Route::post('/logout', function () {
-    return redirect('/login');
-})->name('logout');
+// Show register page
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 
-//landing page
-Route::get('/', function () {
-    return view('landing');
+// Process login
+Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+
+// Process register
+Route::post('/register', [AuthController::class, 'register'])->name('register.process');
+
+// Logout
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', [PropertyController::class, 'landing'])->name('landing');
+
+// Property listing
+
+Route::get('/properties', [PropertyController::class, 'index'])->name('properties');
+
+// Property details
+Route::get('/properties/{id}', [PropertyController::class, 'show'])->name('properties.show');
+
+Route::middleware(['auth'])->group(function() {
+    Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('bookings.my');
+    Route::delete('/bookings/{id}', [BookingController::class, 'destroy'])->name('bookings.destroy');
 });
+// Cart
+Route::get('/cart', [PropertyController::class, 'cart'])->name('properties.cart');
 
-// Property listing in a card
-Route::get('/properties', function () {
-    return view('property'); 
-})->name('properties.index');
+// Checkout
+Route::get('/checkout', [BookingController::class, 'checkout'])->name('checkout');
 
-//single property detail page
-Route::get('/properties/{id}', function ($id) {
-    return view('show', ['id' => $id]); 
-})->name('properties.show');
+Route::get('/bookings', [BookingController::class, 'index']);
 
-//checkout page
 
-Route::get('/checkout/{id}', function ($id) {
-    return view('booking', ['id' => $id]); 
-})->name('checkout');
+// User bookings
+Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
 
-//all user booking routes
-Route::get('/bookings', function () {
-    return view('showbooking');
-})->name('bookings.index');
+Route::get('/admin/dashboard', [AdminController::class, 'index']);
+Route::post('/admin/propertystore', [AdminController::class, 'storeProperty'])->name('admin.property.store');
+// Admin property delete
+Route::delete('/admin/propertydelete/{id}', [PropertyController::class, 'destroy'])->name('property.destroy');
+// Admin - Create Property Form
+Route::get('/admin/propertycreate', [AdminController::class, 'createProperty'])
+    ->name('admin.property.create');
 
-//all admin routes
-Route::get('/admin/dashboard', function () {
-    return view('admin.admindashboard');
-})->name('admin.dashboard');
 
-Route::get('/admin/bookings', function () {
-    return view('admin.adminbookings');
-})->name('admin.bookings');
+Route::get('/admin/property/{id}/edit', [PropertyController::class, 'edit'])->name('property.edit');
+Route::put('/admin/property/{id}', [PropertyController::class, 'update'])->name('property.update');
+Route::get('/admin/bookings', [AdminController::class, 'bookings'])->name('admin.bookings');
+Route::delete('/admin/bookings/{id}', [AdminController::class, 'destroyBooking'])->name('admin.bookings.destroy');
 
-Route::get('/admin/propertycreate', function () {
-    return view('admin.property_form');
-});
-
-Route::get('/admin/propertyedit/{id}', function ($id) {
-    return view('admin.property_edit', ['id' => $id]);
-});

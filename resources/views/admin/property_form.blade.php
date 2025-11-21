@@ -5,10 +5,6 @@
     <div class="card shadow-sm p-4 rounded">
         <h2 class="text-center text-success mb-4">Admin Add Property Form</h2>
         <form id="propertyForm">
-            <div class="mb-3">
-                <label for="property_id" class="form-label">Property ID</label>
-                <input type="number" id="property_id" name="property_id" placeholder="Enter property ID" class="form-control">
-            </div>
 
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
@@ -91,30 +87,43 @@ form.image_url.addEventListener('input', (e) => {
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const newProperty = {
-        property_id: form.property_id.value,
-        title: form.title.value,
-        property_type: form.property_type.value,
-        monthly_rent: parseInt(form.monthly_rent.value),
-        bedrooms: parseInt(form.bedrooms.value),
-        bathrooms: parseInt(form.bathrooms.value),
-        city: form.city.value,
-        description: form.description.value,
-        image_url: form.image_url.value,
-        status: form.status.value
-    };
-    console.log("New Property Data:", newProperty);
 
-    Swal.fire({
-        icon: 'success',
-        title: 'Property Saved!',
-        text: 'The property data has been captured successfully.',
-        confirmButtonColor: '#2c7a7b'
-    });
+    const formData = new FormData(form);
 
-    form.reset();
-    preview.style.display = 'none';
+    fetch('/admin/propertystore', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'  
+        },
+        body: formData,
+        credentials: 'same-origin'
+
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            Swal.fire({
+                icon: 'success',
+                title: 'Property Saved!',
+                text: data.message,
+                confirmButtonColor: '#2c7a7b'
+            }).then(() => {
+                // Redirect to dashboard after user closes the alert
+                window.location.href = '/admin/dashboard';
+            });
+        } else {
+            let errors = Object.values(data.errors).flat().join('<br>');
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Failed',
+                html: errors
+            });
+        }
+    })
+    .catch(err => console.error(err));
 });
+
 </script>
 
 <style>

@@ -9,14 +9,20 @@ class Property extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'title',
-        'description',
-        'price',
-        'bedrooms',
-        'bathrooms',
-        'area',
-        'city',
-        'image',
-    ];
+   protected $fillable = [
+     'title', 'property_type', 'monthly_rent',
+    'bedrooms', 'bathrooms', 'city', 'description', 'image_url', 'status'
+];
+
+public function reviews()
+{
+    return $this->hasMany(Review::class);
+}
+
+public function show($id)
+{
+    $property = Property::with('reviews')->findOrFail($id); // fetch property with reviews
+    return view('properties.show', compact('property'));
+}
+
 }

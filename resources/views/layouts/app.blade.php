@@ -1,3 +1,7 @@
+<!-- admin@gmail.com
+123456 -->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,6 +65,18 @@
 </head>
 
 <body>
+    <script>
+    @if(session('setLocalStorage'))
+        localStorage.setItem('username', "{{ session('setLocalStorage')['username'] }}");
+        localStorage.setItem('role', "{{ session('setLocalStorage')['role'] }}");
+    @endif
+
+    @if(session('clearLocalStorage'))
+        localStorage.removeItem('username');
+        localStorage.removeItem('role');
+    @endif
+</script>
+
 
     @if (request()->is('login') || request()->is('register'))
         <nav class="auth-navbar">

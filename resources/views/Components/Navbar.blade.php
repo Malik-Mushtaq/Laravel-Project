@@ -211,11 +211,13 @@ const guestLinks = [
 ];
 const userLinks = [
   { name: "Properties", href: "/properties" },
-  { name: "Booked Properties", href: "/bookings" }
+  { name: "Booked Properties", href: "/bookings" },
+  { name: "View Cart", href: "/cart" },
 ];
 const adminLinks = [
   { name: "Listing Properties", href: "/admin/dashboard" },
-  { name: "View Bookings", href: "/admin/bookings" }
+  { name: "View Bookings", href: "/admin/bookings" },
+  { name: "Properties", href: "/properties" },
 ];
 const guestButtons = [
   { name: "Login", href: "/login", class: "btn btn-outline-primary me-lg-2" },
@@ -275,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Logout handler
   const logout = () => {
-    localStorage.removeItem("username");
+    localStorage.clear();
     window.location.href = "/";
   };
   document.getElementById("logoutBtn")?.addEventListener("click", logout);
